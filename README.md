@@ -1,4 +1,4 @@
-![University of Bremen Logo](./Logo-Universitaet-Bremen.svg)
+<img src="./Logo-Universitaet-Bremen.svg" alt="University of Bremen Logo" width="300">
 
 # Dr.-Ing. Nils Ellendt – Teaching Materials
 
