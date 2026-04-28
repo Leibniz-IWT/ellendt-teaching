@@ -20,7 +20,7 @@ Please select your course below to access the  lecture-specific scripts:
 In addition to the code provided in this repository, I have developed several web-based interactive applications to help visualize and explore complex engineering and numerical concepts. 
 
 You can access all interactive tools here:
-👉 **[eaching Apps](https://droplets.uni-bremen.de/teaching/)**
+👉 **[teaching Apps](https://droplets.uni-bremen.de/teaching/)**
 
 ---
 
