@@ -1,6 +1,8 @@
+![University of Bremen Logo](./Logo-Universitaet-Bremen.svg)
+
 # Dr.-Ing. Nils Ellendt – Teaching Materials
 
-Welcome! This is the central repository for my lecture materials, coding scripts, and exercises at Leibniz-IWT / University of Bremen. 
+Welcome! This is the central repository for my lecture materials, coding scripts, and exercises at the University of Bremen. 
 
 This repository is designed to help process engineering students bridge the gap between theoretical concepts and practical implementation. Here, you will find the required code, examples, and instructions for my current courses.
 
