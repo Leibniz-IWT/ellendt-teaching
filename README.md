@@ -10,6 +10,7 @@ Please select your course below to access the  lecture-specific scripts:
 
 * [**Numerical Methods for Process Engineers**](./Numerical%20Methods%20for%20Process%20Engineers/README.md)
 * [**Essential Matlab Programming for Process Engineers**](./Essential%20Matlab%20Programming%20for%20Process%20Engineers/README.md)
+* [**Atomization Processes**](./Atomization%20Processes/README.md)
 
 *(Note: Clicking the links above will take you to the specific folder for that course. Please read the `README.md` inside your course folder for instructions on how to run the scripts.)*
 
