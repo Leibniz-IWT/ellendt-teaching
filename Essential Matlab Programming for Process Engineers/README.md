@@ -11,18 +11,13 @@ This folder contains MATLAB scripts (`.m`) and data files that accompany the lec
 The materials are organized chronologically by topic. Click on any folder to view the scripts and data for that unit:
 
 * **[02 - Particle Size Distribution](./02-particle%20size%20distribution)**
-  * `psd.csv`
-  * `readjson.m`
-  * `working_with_psd.m`
+  * Reading text data files, processing data, saving data in an annotated JSON file
 * **[03 - Interpolation and Regression](./03-interpolation%20and%20regression)**
-  * `interpolation_regression.m`
-  * `nitrogen-1bar.txt`
-  * `R2.m`
+  * Interpolation vs. Regression - how to choose the right approach
 * **[04 - Roots](./04-Roots)**
-  * `falling_sphere.m`
-  * `simple_roots.m`
-  * `terminal.m`
-
+  * How to solve nonlinear equations with matlab.
+* **[05 - ODEs](./05-ODEs)
+  * Solution of Ordinary Differential Equation Systems. We take the ODE for a free falling sphere and extend it stepwise until we calculate the trajectory, cooling and solidification of a molten metal droplet
 ---
 
 ## 🚀 How to Run the Scripts
