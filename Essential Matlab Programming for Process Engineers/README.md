@@ -16,7 +16,7 @@ The materials are organized chronologically by topic. Click on any folder to vie
   * Interpolation vs. Regression - how to choose the right approach
 * **[04 - Roots](./04-Roots)**
   * How to solve nonlinear equations with matlab.
-* **[05 - ODEs](./05-ODEs)
+* **[05 - ODEs](./05-ODEs)**
   * Solution of Ordinary Differential Equation Systems. We take the ODE for a free falling sphere and extend it stepwise until we calculate the trajectory, cooling and solidification of a molten metal droplet
 ---
 
