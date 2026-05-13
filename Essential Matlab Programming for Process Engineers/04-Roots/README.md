@@ -1,12 +1,12 @@
-# 1D Unsteady Heat Conduction in a Sphere
+# Root Finding with `fzero` — Applied to Terminal Velocity
 
 ---
 
 ## Topic
 
-This lecture solves the transient heat equation in spherical coordinates using MATLAB's built-in PDE solver `pdepe`. A solid sphere at elevated temperature is cooled by convection at its surface. The solution field $T(r,t)$ is visualised as a surface plot, as temperature profiles at fixed radii, and as radial profiles at fixed times. A cross-sectional 2D slice is reconstructed by rotating the 1D solution around the axis.
+This lecture introduces numerical root finding with MATLAB's `fzero` function. The concept is first demonstrated on a simple mathematical function with two known roots, including cases where `fzero` is unreliable. It is then applied to a physically meaningful problem: finding the terminal velocity of a falling sphere. Because terminal velocity is the steady state of the equation of motion ($du/dt = 0$), it is the root of a nonlinear algebraic equation — root finding in disguise.
 
-The central learning objective is understanding how to cast a real PDE problem into the canonical form required by `pdepe`, and how to interpret the solution through the dimensionless **Biot** and **Fourier** numbers.
+The lecture closes by sweeping over four decades of sphere diameter using `logspace` to produce a terminal velocity map, connecting root finding, drag physics, and log-log visualisation in a single script.
 
 ---
 
@@ -14,88 +14,72 @@ The central learning objective is understanding how to cast a real PDE problem i
 
 | File | Description |
 |---|---|
-| `heat_pde_sphere.m` | Complete script including all local functions |
+| `simple_roots.m` | Abstract introduction to `fzero`: single guess, brackets, problematic cases |
+| `terminal.m` | Right-hand side function $du/dt$; root is the terminal velocity |
+| `falling_sphere.m` | Sweeps sphere diameter from 1 µm to 1 mm; plots $u_\text{term}(d)$ and $u_\text{term}(Re)$ |
 
 ---
 
 ## Physical Background
 
-The problem models a sphere (radius $R = 5$ mm, steel-like properties) initially at $T_0 = 800$ K, cooled by a convective flow at $T_\infty = 293$ K. Because the geometry is spherically symmetric, the 3D problem reduces to a 1D problem in the radial coordinate $r$.
+A sphere of diameter $d$ and density $\rho_s$ falls through a fluid of density $\rho_g$ and kinematic viscosity $\nu$. Gravity accelerates the sphere; drag decelerates it. The sphere reaches **terminal velocity** $u_\infty$ when these forces exactly balance and acceleration vanishes.
 
-Two dimensionless numbers characterise the problem completely:
-
-**Biot number** — ratio of internal conduction resistance to external convection resistance:
-
-$$\text{Bi} = \frac{h R}{k}$$
-
-For $\text{Bi} \ll 1$, temperature gradients inside the sphere are negligible and the much simpler **lumped capacitance model** (Section below) is valid. For larger Bi, a full distributed solution is needed. With the parameters in this script, $\text{Bi} \approx 0.125$ — borderline, which makes this a useful test case.
-
-**Fourier number** — dimensionless time, measuring how far diffusion has penetrated relative to the sphere radius:
-
-$$\text{Fo} = \frac{\alpha\, t}{R^2}, \qquad \alpha = \frac{k}{\rho c_p}$$
-
-At $\text{Fo} \gtrsim 0.2$ the temperature field at the centre has begun to respond to the surface cooling. At $t_\text{end}$ this script reaches $\text{Fo} \approx 1.1$, so the full transient response is captured.
+The drag force depends on the Reynolds number, which in turn depends on velocity — making the force balance a nonlinear algebraic equation that must be solved numerically.
 
 ---
 
 ## Equations
 
-### 1 — The PDE: heat equation in spherical coordinates
+### 1 — Equation of motion
 
-In spherical symmetry (no $\theta$, $\phi$ dependence), the energy balance for a solid gives:
+Newton's second law for a sphere falling through a fluid:
 
-$$\rho c_p \frac{\partial T}{\partial t} = \frac{1}{r^2} \frac{\partial}{\partial r}\!\left( r^2\, k\, \frac{\partial T}{\partial r} \right)$$
+$$\frac{du}{dt} = g - \frac{3}{4}\frac{\rho_g}{\rho_s}\frac{1}{d}\,u^2\,C_d(Re)$$
 
-### 2 — pdepe canonical form
+The drag coefficient uses the **Schiller-Naumann** correlation (valid for $Re < 1000$):
 
-`pdepe` solves equations of the form:
+$$C_d = \frac{24}{Re}\left(1 + 0.15\,Re^{0.687}\right), \qquad Re = \frac{u\,d}{\nu}$$
 
-$$c(x,t,u,u_x)\,\frac{\partial u}{\partial t} = x^{-m}\,\frac{\partial}{\partial x}\!\left(x^m\, f(x,t,u,u_x)\right) + s(x,t,u,u_x)$$
+### 2 — Terminal velocity as a root-finding problem
 
-Matching the heat equation term by term:
+Terminal velocity is the velocity at which $du/dt = 0$:
 
-| pdepe symbol | Physical meaning | Value here |
+$$g - \frac{3}{4}\frac{\rho_g}{\rho_s}\frac{1}{d}\,u_\infty^2\,C_d(Re_\infty) = 0$$
+
+Because $C_d$ itself depends on $u_\infty$ through $Re$, this cannot be solved analytically. It is a nonlinear equation $f(u) = 0$, solved numerically with `fzero`.
+
+### 3 — Brent's method (what `fzero` does internally)
+
+`fzero` combines three methods adaptively:
+
+| Method | Convergence | Requirement |
 |---|---|---|
-| $m$ | geometry flag (0 = slab, 1 = cylinder, 2 = sphere) | $2$ |
-| $c$ | capacity coefficient | $\rho c_p$ |
-| $f$ | flux term | $k\,\partial T/\partial r$ |
-| $s$ | source term | $0$ |
+| Bisection | Linear — slow but guaranteed | Sign change in bracket $[a, b]$ |
+| Secant | Superlinear | Two recent iterates |
+| Inverse quadratic interpolation | Cubic | Three recent iterates |
 
-### 3 — Initial condition
+At each step it picks the method that is both safe (stays inside the bracket) and fastest. A bracket $[a, b]$ with $f(a) \cdot f(b) < 0$ guarantees convergence; a single starting point does not.
 
-$$T(r,\, 0) = T_0 = 800 \text{ K} \quad \text{(uniform)}$$
+### 4 — Problematic cases
 
-### 4 — Boundary conditions
+`fzero` requires a sign change to bracket the root. Two cases where it fails or returns unreliable results:
 
-`pdepe` expects boundary conditions in the form $p + q \cdot f = 0$ on each side.
+- **Tangent root** — $f(x) = \sin(x) + 1$ touches zero at $x = -\pi/2$ but does not cross. No sign change exists, so no bracket can be formed.
+- **Non-negative function** — $f(x) = |x|$ is everywhere $\geq 0$. The "root" at $x = 0$ has no sign change; `fzero` may return a near-zero value but the result is not guaranteed.
 
-**Left boundary ($r = 0$) — symmetry:**  
-For $m = 2$, `pdepe` enforces symmetry automatically; $p_l$ and $q_l$ are ignored.
+### 5 — Parameter sweep with `logspace`
 
-**Right boundary ($r = R$) — convective (Robin) condition:**  
-The physical condition is that the conductive flux at the surface equals the convective flux to the ambient:
+The terminal velocity is computed for sphere diameters spanning four decades:
 
-$$-k\,\frac{\partial T}{\partial r}\bigg|_{r=R} = h\,(T_R - T_\infty)$$
+$$d \in [10^{-6},\, 10^{-3}] \text{ m} \quad (1\,\mu\text{m} \text{ to } 1\,\text{mm})$$
 
-Rewritten in pdepe form with $f = k\,\partial T/\partial r$:
+`logspace(-6, -3, 100)` generates 100 points equally spaced on a logarithmic scale — appropriate here because the physics is scale-invariant (the result plotted on log-log axes collapses onto a power-law curve at low and high Re).
 
-$$\underbrace{h\,(T_R - T_\infty)}_{p_r} + \underbrace{1}_{q_r} \cdot f = 0$$
+The Reynolds number at terminal velocity:
 
-### 5 — Lumped capacitance model (reference / comparison)
+$$Re_\infty = \frac{u_\infty\,d}{\nu}$$
 
-When $\text{Bi} \ll 1$, the temperature is approximately uniform inside the sphere and the analytical solution is:
-
-$$\frac{T(t) - T_\infty}{T_0 - T_\infty} = \exp\!\left(-\frac{h\, A}{\rho c_p V}\, t\right) = \exp\!\left(-\frac{3h}{\rho c_p R}\, t\right)$$
-
-where $A/V = 3/R$ for a sphere. Comparing this exponential decay with the distributed `pdepe` solution shows when the lumped approximation breaks down (centre lags behind the surface for larger Bi).
-
-### 6 — Cross-section reconstruction via polar coordinates
-
-The 1D radial solution $T(r, t^*)$ is rotated through $\phi \in [0, 2\pi]$ to produce a 2D cross-sectional image. Cartesian coordinates are obtained from:
-
-$$x = r \cos\phi, \qquad y = r \sin\phi$$
-
-In MATLAB: `[Xc, Yc] = pol2cart(PHI, RR)` with `T_slice = repmat(T_mid, N_phi, 1)'` tiling the 1D profile along the azimuthal direction.
+is plotted on the second axis to show where the Schiller-Naumann correlation is valid ($Re < 1000$) and where it breaks down.
 
 ---
 
@@ -103,13 +87,15 @@ In MATLAB: `[Xc, Yc] = pol2cart(PHI, RR)` with `T_slice = repmat(T_mid, N_phi, 1
 
 | Concept | Where used |
 |---|---|
-| `pdepe` — canonical form, `m` flag, function signatures | Section 3 |
-| **Local functions** inside a script file | `HeatPDE`, `HeatPDE_IC`, `HeatPDE_BC`, `local_get_props`, `local_get_bc` |
-| Parameter passing via dedicated getter functions | `local_get_props`, `local_get_bc` |
-| `surf` with `shading interp` and `view(0,90)` for 2D colour maps | Section 5 |
-| Selecting rows/columns of a solution matrix for slice plots | Sections 6–7 |
-| `repmat` and `pol2cart` for 2D visualisation from a 1D result | Section 8 |
-| `fprintf` for a structured diagnostic summary | Section 4 |
+| Anonymous functions `f = @(x) ...` | `simple_roots.m` |
+| `fzero` with single starting point | `simple_roots.m`, `falling_sphere.m` |
+| `fzero` with bracket `[a, b]` | `simple_roots.m`, `falling_sphere.m` |
+| `try` / `catch` for handling solver failures gracefully | `simple_roots.m` |
+| Parameter struct passed into a function | `terminal.m`, `falling_sphere.m` |
+| `logspace` for logarithmically spaced vectors | `falling_sphere.m` |
+| `loglog` for log-log plots | `falling_sphere.m` |
+| Pre-allocating output arrays with `zeros` | `falling_sphere.m` |
+| `for` loop over a parameter range | `falling_sphere.m` |
 
 ---
 
@@ -117,16 +103,18 @@ In MATLAB: `[Xc, Yc] = pol2cart(PHI, RR)` with `T_slice = repmat(T_mid, N_phi, 1
 
 After completing this lecture, students should be able to:
 
-1. **Identify the pdepe canonical form** and extract $c$, $f$, $s$ from a given PDE by coefficient comparison.
-2. **Choose the geometry flag** $m \in \{0, 1, 2\}$ for Cartesian slab, cylindrical, or spherical problems.
-3. **Formulate Robin boundary conditions** in the $p + q \cdot f = 0$ form required by `pdepe`.
-4. **Interpret Biot and Fourier numbers** physically and decide whether a lumped capacitance approximation is justified.
-5. **Navigate the solution matrix** `SOL(it, ix)` to extract time slices and radial profiles for plotting.
-6. **Reconstruct a 2D cross-section** from a 1D rotationally symmetric solution using `repmat` and `pol2cart`.
-7. **Organise parameters** in dedicated getter functions so that material properties and boundary values are defined in exactly one place.
+1. **Explain what a root is** and why many engineering problems (equilibria, force balances, intersection of curves) reduce to $f(x) = 0$.
+2. **Always plot first** — identify the number and approximate location of roots visually before calling `fzero`.
+3. **Call `fzero`** with a single starting point and with a bracket, and explain when a bracket is necessary for guaranteed convergence.
+4. **Recognise when `fzero` will fail**: tangent roots and non-negative functions have no sign change, so no bracket exists.
+5. **Use `try`/`catch`** to handle solver failures gracefully so that a script continues even when one case fails.
+6. **Connect root finding to a physical problem**: formulate the terminal velocity condition as $f(u) = 0$ and solve it with `fzero`.
+7. **Use `logspace`** to sweep a parameter over decades and `loglog` to visualise power-law relationships.
 
 ---
 
 ## Further Reading
 
-- MathWorks Documentation: `pdepe` — [https://de.mathworks.com/help/matlab/ref/pdepe.html](https://de.mathworks.com/help/matlab/ref/pdepe.html)
+- Press, W.H. et al.: *Numerical Recipes*, Chapter 9 (Root Finding and Nonlinear Sets of Equations)
+- Brent, R.P.: *Algorithms for Minimization without Derivatives*, Chapter 4 (1973) — original description of Brent's method used inside `fzero`
+- Schiller, L.; Naumann, A.: *Z. Ver. Dtsch. Ing.* 77 (1933) 318–320 (drag correlation)
