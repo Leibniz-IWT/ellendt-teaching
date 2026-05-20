@@ -34,7 +34,7 @@ set(0, 'DefaultLineLineWidth',  1.5, ...
        'DefaultFigureColor',    'w');
 
 %% 2) Geometry and discretization
-R     = 5e-3;       % sphere radius                   [m]
+R     = 5e-4;       % sphere radius                   [m]
 t_end = 5;          % total simulation time           [s]
 Nx    = 101;        % number of radial nodes
 Nt    = 100;        % number of time steps
