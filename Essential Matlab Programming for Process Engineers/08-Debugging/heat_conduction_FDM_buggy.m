@@ -1,7 +1,9 @@
 %% 2D Heat Conduction in a Square Plate”FDM Method
 %  316L stainless steel, 0.1 x 0.1 m
 %  Internal heat source Q, four walls at different temperatures
-%  NOTE: this code contains four deliberate errors
+%
+%  NOTE: this code contains deliberate errors, your task is to find and
+%  correct the errors
 
 clear; close all; clc
 
