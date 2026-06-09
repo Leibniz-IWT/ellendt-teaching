@@ -8,8 +8,8 @@
 clear; close all; clc
 
 %% Material and source
-k  = 1.6;      % thermal conductivity  [W/(m*K)]
-Q  = 0;%5e5;      % heat source           [W/m^3]
+k  = 16;      % thermal conductivity  [W/(m*K)]
+Q  = 5e5;      % heat source           [W/m^3]
 
 %% Geometry
 Lx = 0.1;
@@ -24,10 +24,10 @@ x  = linspace(0, Lx, Nx);
 y  = linspace(0, Ly, Ny);
 
 %% Wall temperatures  [Â°C]
-T_left   = 0;
-T_right  = 0;
-T_bottom = 0;
-T_top    = 0;
+T_left   = 100;
+T_right  = 200;
+T_bottom = 300;
+T_top    = 400;
 
 %% Initialise and apply boundary conditions
 T = zeros(Nx, Ny);
@@ -49,7 +49,7 @@ while rel_res > tol && iter < maxIter
     for i = 2:Nx-1
         for j = 2:Ny-1
             T(i,j) = ( (T(i+1,j) + T(i-1,j)) / dx^2 ...
-                     + (T(i,j+1) + T(i,j+1)) / dy^2 ...
+                     + (T(i,j+1) + T(i,j-1)) / dy^2 ...
                      +  Q/k ) ...
                    / (2/dx^2 + 2/dy^2);
         end
@@ -77,5 +77,5 @@ xlabel('x / m')
 ylabel('y / m')
 title('Temperature field 316L stainless steel plate')
 cb = colorbar;
-cb.Label.String = 'Temperature / K';
+cb.Label.String = 'Temperature / °C';
 axis equal tight

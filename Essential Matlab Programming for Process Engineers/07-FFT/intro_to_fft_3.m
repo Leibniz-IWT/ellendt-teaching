@@ -26,7 +26,7 @@ set(0, 'DefaultLineLineWidth',  1.5, ...
 
 %% 2) Signal parameters
 f0      = 100;    % base frequency             [Hz]
-n_noise = 50;     % noise amplitude (50x signal amplitude)
+n_noise = 10;     % noise amplitude (50x signal amplitude)
 
 %% 3) Generate signal
 t      = linspace(0, 0.1, 1000);
