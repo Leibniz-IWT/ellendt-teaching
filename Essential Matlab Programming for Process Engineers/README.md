@@ -18,6 +18,13 @@ The materials are organized chronologically by topic. Click on any folder to vie
   * How to solve nonlinear equations with matlab.
 * **[05 - ODEs](./05-ODEs)**
   * Solution of Ordinary Differential Equation Systems. We take the ODE for a free falling sphere and extend it stepwise until we calculate the trajectory, cooling and solidification of a molten metal droplet
+* **[06 - PDEs](./06-PDEs)**
+  * 1D unsteady heat conduction in a sphere with `pdepe` — casting a PDE into canonical form and interpreting the solution via the Biot and Fourier numbers
+* **[07 - FFT](./07-FFT)**
+  * Introduction to the Fast Fourier Transform — spectral analysis of increasingly noisy signals and frequency-domain filtering
+* **[08 - Debugging](./08-Debugging)**
+  * Debugging exercise: find and fix four deliberate errors in a 2D finite-difference heat conduction code
+
 ---
 
 ## 🚀 How to Run the Scripts

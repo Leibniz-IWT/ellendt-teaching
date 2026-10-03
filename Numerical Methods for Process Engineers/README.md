@@ -15,6 +15,7 @@ The materials are organized chronologically by topic. Click on any folder to vie
   * `root_finding.ipynb`
 * **[03 - Integration](./03-integration)**
   * `numerical_integration.ipynb`
+  * `adaptive_trapezoidal.ipynb`
 * **[04 - Interpolation and Regression](./04-Interpolation%20and%20Regression)**
   * `interpolation.ipynb`
   * `regression.ipynb`
@@ -25,6 +26,8 @@ The materials are organized chronologically by topic. Click on any folder to vie
   * `ode_solvers.ipynb`
 * **[07 - Finite Difference Method](./07-finite%20difference%20method)**
   * `fdm_heat_conduction.ipynb`
+  * `crank_nicolson.ipynb`
+  * `pde_heat2d.ipynb`
 * **[08 - Finite Element Method](./08-finite%20element%20method)**
   * `fem_complete.ipynb`
 
@@ -40,3 +43,4 @@ To interact with these files, you will need an environment capable of running Ju
 3. Open your terminal or command prompt, navigate to this folder, and type:
    ```bash
    jupyter notebook
+   ```
